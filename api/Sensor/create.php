@@ -7,6 +7,7 @@
 	$status = 'Warning';
 	$message = 'Method not allowed';
 	
+	// hi
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$status = 'Error';
 		$message = 'Unknown error';
