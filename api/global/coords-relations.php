@@ -26,8 +26,8 @@
 				    COALESCE(sr.air_conditioning_type, NULL) AS source_air_cond,
 				    COALESCE(sr.cooling_method, NULL) AS source_cooling_method,
 				    
-                    1 as w,
-                    1 as h,
+            1 as w,
+            1 as h,
 				    
 				    c.id AS i,
 				    c.x AS x,
@@ -42,22 +42,6 @@
 			");
 			
 			$coords = $relRes->fetchAll(PDO::FETCH_ASSOC);
-//			printArray($coords);
-//
-//			$stmt = $pdo->prepare('SELECT * FROM sensor_type WHERE name = ?');
-//			$typeRes = $stmt->execute([$sensor['sensorType']]);
-//
-//			if ($typeRes) {
-//				$type = $stmt->fetch(PDO::FETCH_ASSOC);
-//				$sensor['sensorType'] = (int) $type['id'];
-//			}
-//
-//			$stmt = $pdo->prepare('INSERT INTO coordinates VALUES (NULL, ?, ?)');
-//			$coordsRes = $stmt->execute(array_values($selected));
-//			$coordsId = $pdo->lastInsertId();
-//
-//			$stmt = $pdo->prepare("INSERT INTO sensor VALUES (null, ?, ?, ?, $coordsId)");
-//			$sensorRes = $stmt->execute(array_values($sensor));
 		} catch (Exception $e) {
 			http_response_code(500);
 			$status = 'Error';
