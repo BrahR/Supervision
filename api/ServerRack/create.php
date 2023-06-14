@@ -47,5 +47,4 @@
 		exit();
 	}
 	
-	http_response_code(405);
-	echo json_encode(['status' => $status, 'message' => $message]);
+  sendResponse(405, $status, $message);
