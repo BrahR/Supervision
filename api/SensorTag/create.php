@@ -3,25 +3,29 @@
 	require_once '../config/db.php';
 	require_once '../config/helpers.php';
 	require_once '../config/api-headers.php';
-
+	
 	if ($_SERVER["REQUEST_METHOD"] !== 'POST') {
 		sendResponse(405, 'Warning', 'Method not allowed');
 	}
 	
 	$_POST = json_decode(file_get_contents("php://input"),true);
-	$required = ['x:0', 'y:0', 'i'];
+	
+	$required = ['id', 'temperature?', 'humidity?'];
 	[$values, $errors] = validateInputs($required, $_POST);
+	$values = array_reverse($values);
 	
 	if (!empty($errors)) {
 		sendResponse(
 		   400,
 		   'Error',
-		   'Missing required fields: ' . implode(', ', $errors)
+		   'Missing required field: ' . implode(', ', $errors)
 		);
 	}
 	
+	$field = array_keys($values)[0];
+	
 	try {
-		$stmt = $pdo->prepare('UPDATE coordinates SET x = ?, y = ? WHERE id = ?');
+		$stmt = $pdo->prepare("INSERT INTO sensor_tag ($field, sensor_id) VALUES (?, ?)");
 		$res = $stmt->execute(array_values($values));
 	} catch (Exception $e) {
 		sendResponse(500, 'Error', $e->getMessage());
@@ -30,5 +34,5 @@
 	sendResponse(
 	   200,
 	   $res ? 'Success' : 'Error',
-	   $res ? 'Coordinates updated successfully' : 'Coordinates not updated'
+	   $res ? 'Sensor tag created successfully' : "Couldn't create sensor tag"
 	);

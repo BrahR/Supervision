@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { Ref, ref, UnwrapRef } from 'vue'
+import { h, Ref, ref, UnwrapRef } from 'vue'
 import { TYPE, useToast } from 'vue-toastification'
 import axios from 'axios'
 import ToastNotification from '@/components/ToastNotification.vue'
-import IconServerRack from "@/components/icons/IconServerRack.vue";
-import IconHumiditySensor from "@/components/icons/IconHumiditySensor.vue";
-import Sensor from "@/components/Sensor.vue";
+import IconServerRack from '@/components/icons/IconServerRack.vue'
+import IconHumiditySensor from '@/components/icons/IconHumiditySensor.vue'
+import Sensor from '@/components/Sensor.vue'
+import { useTippy } from 'vue-tippy'
 
 type Layout = {
   source_air_cond: string | null
@@ -32,7 +33,6 @@ const getStuff = async (): Promise<Layout[]> => {
 
 const layout: Ref<UnwrapRef<Layout[]>> = ref(await getStuff())
 
-
 const checkOverlap = (i: number, x: number, y: number) => {
   console.log('checkOverlap')
   return layout.value.find((item) => item.x === x && item.y === y && item.i !== i)
@@ -53,15 +53,18 @@ const moved = async (i: number, x: number, y: number) => {
     layout.value = await getStuff()
     overlap.value = false
 
-    toast({
-      component: ToastNotification,
-      props: {
-        status: "Overlapped",
-        message: "Elements overlapped all changes have been reverted!"
+    toast(
+      {
+        component: ToastNotification,
+        props: {
+          status: 'Overlapped',
+          message: 'Elements overlapped all changes have been reverted!'
+        }
+      },
+      {
+        type: TYPE.INFO
       }
-    }, {
-      type: TYPE.INFO
-    })
+    )
     return
   }
 
@@ -105,6 +108,13 @@ const moved = async (i: number, x: number, y: number) => {
     layout.value = await getStuff()
   }
 }
+
+import SensorTooltip from '@/components/SensorTooltip.vue'
+
+//get document body
+const body = document.querySelector('body')
+
+
 </script>
 
 <template>
@@ -123,14 +133,28 @@ const moved = async (i: number, x: number, y: number) => {
         :isResizable="false"
         @moved="moved"
         @move="move"
-        style="z-index: 9"
+        style="z-index: 2"
       >
-<!--        {{  }}-->
+        <!--        {{  }}-->
         <IconServerRack v-if="item.source_table === 'server_rack'" />
-        <Sensor v-if="item.source_table === 'sensor'" :type="item.source_type" />
+        <!-- @ts-ignore -->
+        <div
+          v-if="item.source_table === 'sensor'"
+          class="sensor"
+          v-tippy="{
+            content: h(SensorTooltip, {
+              source: item,
+            }),
+            appendTo: body,
+            interactive: true
+          }"
+        >
+          <Sensor :type="item.source_type" />
+        </div>
       </grid-item>
     </template>
   </grid-layout>
+  <!--  <div ref="sen">e</div>-->
 </template>
 
 <style scoped>
@@ -158,5 +182,14 @@ const moved = async (i: number, x: number, y: number) => {
   //top: 1rem;
   //right: 1rem;
   //z-index: 1;
+}
+
+.sensor {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

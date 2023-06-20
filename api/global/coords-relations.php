@@ -26,8 +26,8 @@
 				    COALESCE(sr.air_conditioning_type, NULL) AS source_air_cond,
 				    COALESCE(sr.cooling_method, NULL) AS source_cooling_method,
 				    
-            1 as w,
-            1 as h,
+					1 as w,
+					1 as h,
 				    
 				    c.id AS i,
 				    c.x AS x,

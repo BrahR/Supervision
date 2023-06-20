@@ -7,7 +7,8 @@
 	$status = 'Warning';
 	$message = 'Method not allowed';
 	
-  // This is the new part
+	$_POST = json_decode(file_get_contents("php://input"),true);
+ 
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$status = 'Error';
 		$message = 'Unknown error';
@@ -55,4 +56,4 @@
 		exit();
 	}
 	
-  sendResponse(405, $status, $message);
+    sendResponse(405, $status, $message);
