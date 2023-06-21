@@ -19,7 +19,6 @@ console.log(props.type);
   <IconHumiditySensor v-if="props.type === 'Humidity'" />
   <IconMotionSensor v-if="props.type === 'Motion'" />
   <IconProximitySensor v-if="props.type === 'Proximity'" />
-
 </template>
 
 <style scoped>

@@ -80,6 +80,7 @@ import AddComponent from "@/components/AddComponent.vue";
 import ComponentModal from "@/components/ComponentModal.vue";
 import LayoutGrid from "@/components/LayoutGrid.vue";
 import { Skeletor } from 'vue-skeletor';
+import { RouterLink } from "vue-router";
 
 const clickedX = ref<number | null>(null);
 const clickedY = ref<number | null>(null);
@@ -101,59 +102,60 @@ const closeModal = () => {
 </script>
 
 <template>
-  <div class="grid-layout-container">
-    <Suspense>
-      <template #default>
-        <div>
-          <grid-layout
-            class="add-grids"
-            v-model:layout="addLayout"
-            :col-num="12"
-            :row-height="50"
-            :vertical-compact="true"
-            style="z-index: 8"
+  <div class="wrapper-container">
+    <div class="grid-layout-container">
+      <Suspense>
+        <template #default>
+          <div>
+            <grid-layout
+              class="add-grids"
+              v-model:layout="addLayout"
+              :col-num="12"
+              :row-height="50"
+              :vertical-compact="true"
+              style="z-index: 1"
 
-          >
-            <template #default="{ gridItemProps }">
-              <!-- | gridItemProps props from GridLayout | -->
-              <!--breakpointCols: props.cols-->
-              <!--colNum: props.colNum-->
-              <!--containerWidth: width.value-->
-              <!--isDraggable: props.isDraggable-->
-              <!--isResizable: props.isResizable-->
-              <!--lastBreakpoint: lastBreakpoint.value-->
-              <!--margin: props.margin-->
-              <!--maxRows: props.maxRows-->
-              <!--responsive: props.responsive-->
-              <!--rowHeight: props.rowHeight-->
-              <!--useCssTransforms: props.useCssTransforms-->
-              <!--width: width.value-->
-              <grid-item
-                v-bind="gridItemProps"
-                v-for="item in addLayout"
-                :key="item.i"
-                :x="item.x"
-                :y="item.y"
-                :w="item.w"
-                :h="item.h"
-                :i="item.i"
-                :isDraggable="false"
-                :isResizable="false"
-              >
-                <AddComponent @click="showModal(item.x, item.y)" />
-              </grid-item>
-            </template>
-          </grid-layout>
-          <LayoutGrid />
-        </div>
-      </template>
+            >
+              <template #default="{ gridItemProps }">
+                <!-- | gridItemProps props from GridLayout | -->
+                <!--breakpointCols: props.cols-->
+                <!--colNum: props.colNum-->
+                <!--containerWidth: width.value-->
+                <!--isDraggable: props.isDraggable-->
+                <!--isResizable: props.isResizable-->
+                <!--lastBreakpoint: lastBreakpoint.value-->
+                <!--margin: props.margin-->
+                <!--maxRows: props.maxRows-->
+                <!--responsive: props.responsive-->
+                <!--rowHeight: props.rowHeight-->
+                <!--useCssTransforms: props.useCssTransforms-->
+                <!--width: width.value-->
+                <grid-item
+                  v-bind="gridItemProps"
+                  v-for="item in addLayout"
+                  :key="item.i"
+                  :x="item.x"
+                  :y="item.y"
+                  :w="item.w"
+                  :h="item.h"
+                  :i="item.i"
+                  :isDraggable="false"
+                  :isResizable="false"
+                >
+                  <AddComponent @click="showModal(item.x, item.y)" />
+                </grid-item>
+              </template>
+            </grid-layout>
+            <LayoutGrid />
+          </div>
+        </template>
 
-      <template #fallback>
-        <Skeletor style="z-index: 100" height="400"/>
-      </template>
-    </Suspense>
+        <template #fallback>
+          <Skeletor style="z-index: 100" height="400"/>
+        </template>
+      </Suspense>
+    </div>
   </div>
-
   <ComponentModal
     :show-model-el="modalShown"
     :selected-x="clickedX"
@@ -163,6 +165,15 @@ const closeModal = () => {
 </template>
 
 <style scoped>
+.wrapper-container {
+  background-color: #3f3f3f;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .vue-grid-item {
   background-color: #3f3f3f;
   display: flex;

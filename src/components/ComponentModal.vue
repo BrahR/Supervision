@@ -20,7 +20,7 @@ defineProps<{
 
 const closeModal = () => {
   emits('close');
-  select.value = '1';
+  select.value = '';
 };
 
 const options = [

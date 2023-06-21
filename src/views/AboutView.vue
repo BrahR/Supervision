@@ -1,15 +1,15 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
+  <button ref="btn">Hi</button>
 </template>
 
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
-</style>
+<script setup lang="ts">
+
+import { Ref, ref } from "vue";
+import { useTippy } from "vue-tippy";
+
+const btn: Ref<HTMLButtonElement> = ref(null) as any;
+
+useTippy(btn, {
+  content: "Joe Mama",
+})
+</script>

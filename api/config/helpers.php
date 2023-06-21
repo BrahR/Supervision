@@ -7,6 +7,16 @@
 			$params = explode(':', $item);
 			$val = $postValues[$params[0]] ?? null;
 			
+			if (str_contains($item, '?')) {
+				$params = trim($params[0], '?');
+				$val = $postValues[$params] ?? null;
+				
+				if ($val === null) continue;
+				
+				$values[$params] = $val;
+				continue;
+			}
+			
 			$isValid = count($params) == 1 ? empty($val) : (empty($val) && $val != $params[1]);
 			
 			if ($isValid) {
@@ -14,10 +24,10 @@
 				continue;
 			}
 			
-			$values[$item] = $val;
+			$values[$params[0]] = $val;
 		}
 		
-		return [ $values, $error ];
+		return [$values, $error];
 	}
 	
 	function printArray($array): void {
