@@ -1,59 +1,40 @@
 <?php
-	/* @var $pdo PDO */
-	require_once '../config/db.php';
-	require_once '../config/helpers.php';
-	require_once '../config/api-headers.php';
-	
-	$status = 'Warning';
-	$message = 'Method not allowed';
-	
-	$_POST = json_decode(file_get_contents("php://input"),true);
- 
-	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-		$status = 'Error';
-		$message = 'Unknown error';
+require '../config/db.php';
+
+if(isset($_POST['add'])){
+    $name = $_POST['name'];
+    $coord_id = $_POST['coord_id'];
+    $sensor_type = $_POST['sensor_type'];
+    $description = $_POST['description'];
+
+    $insert = "INSERT INTO `sensor` (`name`, `description`, `sensor_type`, `coord_id`) 
+               VALUES (:name, :description, :sensor_type, :coord_id)";
 		
-		$_POST = json_decode(file_get_contents("php://input"),true);
-		$required = ['name', 'description', 'sensorType', 'selectedX:0','selectedY:0'];
-		[$values, $errors] = validateInputs($required, $_POST);
-		
-		if (!empty($errors)) {
-			$status = 'Error';
-			$message = 'Missing required fields: ' . implode(', ', $errors);
-		}
-		
-		$sensor = array_slice($values, 0, 3);
-		$selected = array_slice($values, 3);
-		
-		try {
-			$stmt = $pdo->prepare('SELECT * FROM sensor_type WHERE name = ?');
-			$typeRes = $stmt->execute([$sensor['sensorType']]);
-			
-			if ($typeRes) {
-				$type = $stmt->fetch(PDO::FETCH_ASSOC);
-				$sensor['sensorType'] = (int) $type['id'];
-			}
-			
-			$stmt = $pdo->prepare('INSERT INTO coordinates VALUES (NULL, ?, ?)');
-			$coordsRes = $stmt->execute(array_values($selected));
-			$coordsId = $pdo->lastInsertId();
-			
-			$stmt = $pdo->prepare("INSERT INTO sensor VALUES (null, ?, ?, ?, $coordsId)");
-			$sensorRes = $stmt->execute(array_values($sensor));
-		} catch (Exception $e) {
-			http_response_code(500);
-			$status = 'Error';
-			$message = $e->getMessage();
-		}
-		
-		if ($typeRes && $coordsRes && $sensorRes) {
-			$status = 'Success';
-			$message = 'Sensor created successfully';
-		}
-		
-		$response = ['status' => $status, 'message' => $message];
-		echo json_encode($response);
-		exit();
-	}
-	
-    sendResponse(405, $status, $message);
+    $stmt = $pdo->prepare($insert);
+    $stmt->bindParam(':name', $name);
+    $stmt->bindParam(':description', $description);
+    $stmt->bindParam(':sensor_type', $sensor_type);
+    $stmt->bindParam(':coord_id', $coord_id);
+    $stmt->execute();
+}
+?>
+
+<form action="" method="POST" align="center" width="">
+    <label for="">Equipment name:</label>
+    <input type="text" name="name">
+    <br><br>
+
+    <label for="">Equipment description:</label>
+    <input type="text" name="description">
+    <br><br>
+
+    <label for="">Sensor type:</label>
+    <input type="number" name="sensor_type">
+    <br><br>
+
+    <label for="">Coord ID:</label>
+    <input type="number" name="coord_id">
+    <br><br>
+
+    <button type="submit" name="add">Add</button>
+</form>
