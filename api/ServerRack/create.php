@@ -4,22 +4,15 @@
 	require_once '../config/helpers.php';
 	require_once '../config/api-headers.php';
 	
-	$status = 'Warning';
-	$message = 'Method not allowed';
-	
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		// _POST is a form data variable so it can't take json/string data
-		$status = 'Error';
-		$message = 'Unknown error';
 		
 		$_POST = json_decode(file_get_contents("php://input"),true);
 		$required = ['name', 'airConditioning', 'rackType', 'coolingMethod', 'selectedX:0','selectedY:0'];
 		[$values, $errors] = validateInputs($required, $_POST);
 		
-		if (!empty($errors)) {
-			$status = 'Error';
-			$message = 'Missing required fields: ' . implode(', ', $errors);
-		}
+		if (!empty($errors))
+			sendResponse(500, 'Error', 'Missing required fields: ' . implode(', ', $errors));
 		
 		$rack = array_slice($values, 0, 4);
 		$selected = array_slice($values, 4);
@@ -32,19 +25,13 @@
 			$stmt = $pdo->prepare("INSERT INTO server_rack VALUES (null, ?, ?, ?, ?, $coordsId, 1)");
 			$rackRes = $stmt->execute(array_values($rack));
 			
-			if ($rackRes && $coordsRes) {
-				$status = 'Success';
-				$message = 'Server rack created successfully';
-			}
+			if ($rackRes && $coordsRes)
+				sendResponse(200, 'Success', 'Server rack created successfully');
 		} catch (Exception $e) {
-			http_response_code(500);
-			$status = 'Error';
-			$message = $e->getMessage();
+			sendResponse(500, 'Error', $e->getMessage());
 		}
 		
-		$response = ['status' => $status, 'message' => $message];
-		echo json_encode($response);
-		exit();
+		sendResponse(405, 'Error', 'Unknown error');
 	}
 	
-  sendResponse(405, $status, $message);
+	sendResponse(405, 'Warning', 'Method not allowed');
