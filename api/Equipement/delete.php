@@ -1,25 +1,30 @@
 <?php
-    require '../config/db.php';
+	/* @var $pdo PDO */
+	require_once '../config/db.php';
+	require_once '../config/helpers.php';
+	require_once '../config/api-headers.php';
+	
+	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+		// _POST is a form data variable so it can't take json/string data
+		
+		$_POST = json_decode(file_get_contents("php://input"),true);
+		$required = ['id'];
+		[$values, $errors] = validateInputs($required, $_POST);
+		
+		if (!empty($errors))
+			sendResponse(500, 'Error', 'Missing required fields: ' . implode(', ', $errors));
 
-    if(isset($_POST['delete'])){
-        $id = $_POST['id'];
-        
-       echo $rqt = "DELETE FROM `equipment` WHERE id=:id";
-        $stmt = $pdo->prepare($rqt);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
+		try {
+			$stmt = $pdo->prepare("DELETE FROM `equipment` WHERE id = ?");
 
-        header("Location: read.php");
-        exit();
-    }
-
-?>
-
-<form action="" method="POST" align="center" width="">
-
-    <label for="">ID equipemenet :</label>
-    <input type="text" name="id">
-    <br><br>
-    <button type="submit" name="delete">DELETE</button>
-
-</form>
+			$coordsRes = $stmt->execute(array_values($values));
+			if ($coordsRes)
+				sendResponse(200, 'Success', 'Server rack created successfully');
+		} catch (Exception $e) {
+			sendResponse(500, 'Error', $e->getMessage());
+		}
+		
+		sendResponse(405, 'Error', 'Unknown error');
+	}
+	
+	sendResponse(405, 'Warning', 'Method not allowed');
