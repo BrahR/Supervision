@@ -2,11 +2,17 @@
 import { h, Ref, ref, UnwrapRef } from 'vue'
 import { TYPE, useToast } from 'vue-toastification'
 import axios from 'axios'
+import { useTippy } from 'vue-tippy'
+const body = document.querySelector('body')
+
+
 import ToastNotification from '@/components/ToastNotification.vue'
 import IconServerRack from '@/components/icons/IconServerRack.vue'
-import IconHumiditySensor from '@/components/icons/IconHumiditySensor.vue'
 import Sensor from '@/components/Sensor.vue'
-import { useTippy } from 'vue-tippy'
+import SensorTooltip from '@/components/SensorTooltip.vue'
+import IconHumiditySensor from '@/components/icons/IconHumiditySensor.vue'
+import EquipementModal from "@/components/EquipementModal.vue";
+import RackTooltip from "@/components/RackTooltip.vue";
 
 type Layout = {
   source_air_cond: string | null
@@ -21,6 +27,7 @@ type Layout = {
   i: number
   h: number
   w: number
+  tag: number
 }
 
 const toast = useToast()
@@ -31,7 +38,11 @@ const getStuff = async (): Promise<Layout[]> => {
   return json.data
 }
 
-const layout: Ref<UnwrapRef<Layout[]>> = ref(await getStuff())
+let layout: Ref<UnwrapRef<Layout[]>> = ref(await getStuff())
+
+setInterval(async () => {
+  layout.value = await getStuff()
+}, 1000)
 
 const checkOverlap = (i: number, x: number, y: number) => {
   console.log('checkOverlap')
@@ -109,11 +120,29 @@ const moved = async (i: number, x: number, y: number) => {
   }
 }
 
-import SensorTooltip from '@/components/SensorTooltip.vue'
+const clickedX = ref<number | null>(null);
+const clickedY = ref<number | null>(null);
+const modalShown = ref<boolean>(false);
+const clickedRack = ref<number | null>(null)
 
-//get document body
-const body = document.querySelector('body')
+const showModal = (x: number, y: number, id: number) => {
+  clickedX.value = x;
+  clickedY.value = y;
+  modalShown.value = true;
+  clickedRack.value = id;
+};
 
+const closeModal = () => {
+  clickedY.value = null;
+  clickedX.value = null;
+  modalShown.value = false;
+  clickedRack.value = null;
+};
+
+const deleteRack = () => {
+  console.log('e')
+  layout.value = layout.value.filter((i) => i.i !== clickedRack.value)
+}
 
 </script>
 
@@ -135,9 +164,21 @@ const body = document.querySelector('body')
         @move="move"
         style="z-index: 2"
       >
-        <!--        {{  }}-->
-        <IconServerRack v-if="item.source_table === 'server_rack'" />
-        <!-- @ts-ignore -->
+        <div
+          v-if="item.source_table === 'server_rack'"
+          class="server_rack"
+          v-tippy="{
+            content: h(RackTooltip, {
+              onDelete: deleteRack,
+              onUpdate: deleteRack,
+              source: item,
+            }),
+            appendTo: body,
+            interactive: true,
+          }"
+        >
+          <IconServerRack v-if="item.source_table === 'server_rack'" @click="showModal(item.x, item.y, item.i)" />
+        </div>
         <div
           v-if="item.source_table === 'sensor'"
           class="sensor"
@@ -155,6 +196,13 @@ const body = document.querySelector('body')
     </template>
   </grid-layout>
   <!--  <div ref="sen">e</div>-->
+  <EquipementModal
+    :rack-id="clickedRack"
+    :selected-x="clickedX"
+    :selected-y="clickedY"
+    :show-model-el="modalShown"
+    @close="closeModal"
+  />
 </template>
 
 <style scoped>
@@ -184,7 +232,7 @@ const body = document.querySelector('body')
   //z-index: 1;
 }
 
-.sensor {
+.sensor, .server_rack {
   position: absolute;
   width: 100%;
   height: 100%;

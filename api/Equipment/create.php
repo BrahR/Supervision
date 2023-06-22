@@ -8,17 +8,17 @@
 		// _POST is a form data variable so it can't take json/string data
 		
 		$_POST = json_decode(file_get_contents("php://input"),true);
-		$required = ['id'];
+		$required = ['name', 'description','type', 'unitSize:0', 'rackId:0'];
 		[$values, $errors] = validateInputs($required, $_POST);
 		
 		if (!empty($errors))
 			sendResponse(500, 'Error', 'Missing required fields: ' . implode(', ', $errors));
 
 		try {
-			$stmt = $pdo->prepare("DELETE FROM `equipment` WHERE id = ?");
+			$stmt = $pdo->prepare("INSERT INTO equipment VALUES (NULL, ?, ?, ?, ?, ?)");
 
-			$coordsRes = $stmt->execute(array_values($values));
-			if ($coordsRes)
+			$eqRes = $stmt->execute(array_values($values));
+			if ($eqRes)
 				sendResponse(200, 'Success', 'Server rack created successfully');
 		} catch (Exception $e) {
 			sendResponse(500, 'Error', $e->getMessage());

@@ -25,7 +25,8 @@
     "vue-tippy": "^6.2.0",
     "vue-toastification": "^2.0.0-rc.5",
     "vue3-drr-grid-layout": "^1.9.7",
-    "vuelidate": "^0.7.7"
+    "vuelidate": "^0.7.7",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.2.0",

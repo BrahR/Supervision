@@ -4,7 +4,7 @@
     <div>Sensor type: {{ source.source_type }} </div>
     <div>Sensor description: {{ source.source_description }} </div>
     <div class="m-auto badge badge-info gap-2">
-      20
+      {{ source.tag }}
     </div>
   </div>
 </template>
@@ -15,6 +15,9 @@
     badge-warning
     badge-error
  */
+
+console.log(props.source.tag)
+
 type Layout = {
   source_air_cond: string | null
   source_cooling_method: string | null
@@ -28,9 +31,10 @@ type Layout = {
   i: number
   h: number
   w: number
+  tag: number
 }
 
-defineProps<{
+const props = defineProps<{
   source: Layout
 }>()
 

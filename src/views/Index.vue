@@ -22,8 +22,7 @@
     <li><a href="#banniere" onclick="toggleMenu();">Accueil</a></li>
     <li><a href="#apropos" onclick="toggleMenu();">A propos</a></li>
     <li><a href="#menu" onclick="toggleMenu();">température</a></li>
-    <li><a href="#expert" onclick="toggleMenu();">Expert</a></li>
-    <li><a href="#contact" onclick="toggleMenu();">Contact</a></li>
+    <li><RouterLink to="login">Login</RouterLink></li>
   </ul>
 </header>
 
